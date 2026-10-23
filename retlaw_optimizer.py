@@ -1,7 +1,8 @@
-"""IMEYFISHY OPTIMIZER - Optimizador seguro para jugadores competitivos (Windows 10/11 x64)."""
+"""Optimizador seguro para jugadores competitivos (Windows 10/11 x64). Marca y colores en brand.py."""
 import os, sys, json, time, shutil, ctypes, tempfile, threading, subprocess
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
+from brand import *
 try:
     import psutil
 except ImportError:
@@ -11,13 +12,8 @@ try:
 except ImportError:
     winreg = None
 
-APP, VERSION = "IMEYFISHY OPTIMIZER", "1.1"
-BRAND1, BRAND2 = "IMEYFISHY", "OPTIMIZER"
-BG, PANEL, CARD, BLUE, BLUE_DIM, BLUE_HOT = "#0a0712", "#120c1f", "#1a1230", "#a855f7", "#5b2a9e", "#c084fc"
-FG, DIM, OK, WARN, ERR = "#f3e8ff", "#8f7fa8", "#2ecc71", "#f1c40f", "#ff5c5c"
-BORDER, TROUGH, HOVER_NAV, HOVER_BTN, ACCENT_TXT, TOAST_BG, LOG_BG, LOG_FG = "#2d2050", "#241a3d", "#1f1538", "#2a1d4a", "#120a1f", "#1c1233", "#07050d", "#d8b4fe"
 NO_WIN = 0x08000000
-DATA_DIR = os.path.join(os.getenv("APPDATA", tempfile.gettempdir()), "ImeyfishyOptimizer")
+DATA_DIR = os.path.join(os.getenv("APPDATA", tempfile.gettempdir()), DATA_FOLDER)
 os.makedirs(DATA_DIR, exist_ok=True)
 LOG_FILE = os.path.join(DATA_DIR, "cambios.json")
 
@@ -47,7 +43,7 @@ PROTECTED_PROCS = {"system", "registry", "smss.exe", "csrss.exe", "wininit.exe",
     "securityhealthsystray.exe", "mpdefendercoreservice.exe", "easyanticheat.exe", "easyanticheat_eos.exe", "easyanticheat_launcher.exe", "beservice.exe",
     "fortniteclient-win64-shipping.exe", "fortniteclient-win64-shipping_eac.exe", "fortniteclient-win64-shipping_eac_eos.exe", "fortnitelauncher.exe",
     "epicgameslauncher.exe", "epicwebhelper.exe", "audiodg.exe", "spoolsv.exe", "searchindexer.exe", "nvcontainer.exe", "nvdisplay.container.exe", "nvidia share.exe",
-    "amdrsserv.exe", "radeonsoftware.exe", "igfxem.exe", "conhost.exe", "wmiprvse.exe", "dllhost.exe", "python.exe", "pythonw.exe", "imeyfishy_optimizer.exe", "retlaw_optimizer.exe",
+    "amdrsserv.exe", "radeonsoftware.exe", "igfxem.exe", "conhost.exe", "wmiprvse.exe", "dllhost.exe", "python.exe", "pythonw.exe", "shark_optimizer.exe", "imeyfishy_optimizer.exe", "retlaw_optimizer.exe",
     "applicationframehost.exe", "startmenuexperiencehost.exe", "shellexperiencehost.exe", "textinputhost.exe", "lockapp.exe", "wudfhost.exe", "dashost.exe",
     "memory compression", "idle", "system idle process"}
 OPTIONAL_HINTS = {"discord.exe": "Discord", "spotify.exe": "Spotify", "chrome.exe": "Google Chrome", "msedge.exe": "Microsoft Edge", "firefox.exe": "Firefox",

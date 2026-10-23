@@ -1,9 +1,9 @@
-# IMEYFISHY OPTIMIZER
+# SHARK OPTIMIZER
 
 Optimizador seguro para jugadores competitivos de Fortnite (Windows 10/11 x64). Tema negro y morado.
 
 ## Descargar
-Ve a la pestaña **Releases** y descarga `IMEYFISHY_OPTIMIZER.exe`. Es un único archivo: doble clic y listo.
+Ve a la pestaña **Releases** y descarga `SHARK_OPTIMIZER.exe`. Es un único archivo: doble clic y listo.
 No necesita Python ni ninguna instalación. Si Windows SmartScreen avisa, pulsa "Más información" → "Ejecutar de todas formas" (el .exe no está firmado digitalmente).
 
 ## Funciones
@@ -16,6 +16,9 @@ No necesita Python ni ninguna instalación. Si Windows SmartScreen avisa, pulsa 
 
 ## Logo
 Haz clic en el logo (arriba a la izquierda) dentro de la app y elige tu PNG.
+
+## Cambiar nombre o colores
+Edita `brand.py` (nombre, carpeta de datos y paleta) y el nombre del .exe en `.github/workflows/build.yml`.
 
 ## Compilación
 GitHub Actions compila automáticamente el .exe con PyInstaller en Windows x64 en cada cambio (`.github/workflows/build.yml`).
