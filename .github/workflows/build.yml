@@ -1,0 +1,51 @@
+name: Build RETLAW_OPTIMIZER.exe
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          architecture: x64
+      - name: Install build tools
+        run: pip install pyinstaller psutil
+      - name: Build single-file EXE (no console, asks for admin)
+        run: pyinstaller --onefile --noconsole --name RETLAW_OPTIMIZER --uac-admin --clean retlaw_optimizer.py
+      - name: Verify EXE exists
+        shell: pwsh
+        run: |
+          $f = Get-Item dist/RETLAW_OPTIMIZER.exe
+          "Tamano: $([math]::Round($f.Length/1MB,1)) MB"
+          if ($f.Length -lt 5MB) { throw "EXE demasiado pequeno, compilacion incorrecta" }
+      - name: Smoke test (EXE starts without Python)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath dist/RETLAW_OPTIMIZER.exe -PassThru
+          Start-Sleep -Seconds 8
+          if ($p.HasExited) { throw "El EXE se cerro solo (codigo $($p.ExitCode))" }
+          Stop-Process -Id $p.Id -Force
+          "El EXE arranco correctamente"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RETLAW_OPTIMIZER
+          path: dist/RETLAW_OPTIMIZER.exe
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: RETLAW OPTIMIZER v1.0.${{ github.run_number }}
+          body: |
+            RETLAW_OPTIMIZER.exe - Windows 10/11 x64, archivo unico, sin instalacion.
+            Clic derecho > Ejecutar como administrador para todas las funciones.
+          files: dist/RETLAW_OPTIMIZER.exe
