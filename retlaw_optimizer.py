@@ -581,12 +581,12 @@ class App(tk.Tk):
         RUN = r"Software\Microsoft\Windows\CurrentVersion\Run"; APPR = r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"
         return [("HKCU Run", "HKCU", RUN, APPR), ("HKLM Run", "HKLM", RUN, APPR), ("HKLM Run (32)", "HKLM", r"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Run", APPR + "32")]
 
-    def _root(self, name): return winreg.HKEY_CURRENT_USER if name == "HKCU" else winreg.HKEY_LOCAL_MACHINE
+    def _hive(self, name): return winreg.HKEY_CURRENT_USER if name == "HKCU" else winreg.HKEY_LOCAL_MACHINE
 
     def scan_startup(self):
         rows = []
         for label, rootname, runp, appr in self._sources():
-            root = self._root(rootname)
+            root = self._hive(rootname)
             try:
                 with winreg.OpenKey(root, runp) as k:
                     i = 0
@@ -628,7 +628,7 @@ class App(tk.Tk):
             try:
                 if rootname:
                     if rootname == "HKLM" and not is_admin(): self.log(name + ": requiere administrador."); continue
-                    with winreg.CreateKey(self._root(rootname), appr) as a: winreg.SetValueEx(a, name, 0, winreg.REG_BINARY, bytes([2 if enable else 3]) + bytes(11))
+                    with winreg.CreateKey(self._hive(rootname), appr) as a: winreg.SetValueEx(a, name, 0, winreg.REG_BINARY, bytes([2 if enable else 3]) + bytes(11))
                 else:
                     p = r[1]; newp = p[:-9] if (enable and p.lower().endswith(".disabled")) else (p if enable else p + ".disabled")
                     if newp != p: os.rename(p, newp)
@@ -676,7 +676,7 @@ class App(tk.Tk):
                 sh("powercfg /setactive " + (r["old"] or "381b4222-f694-41f0-9685-ff5bb260df2e"))
             elif r["type"] == "startup":
                 if r["root"]:
-                    with winreg.CreateKey(self._root(r["root"]), r["appr"]) as a: winreg.SetValueEx(a, r["name"], 0, winreg.REG_BINARY, bytes([2 if r["was_enabled"] else 3]) + bytes(11))
+                    with winreg.CreateKey(self._hive(r["root"]), r["appr"]) as a: winreg.SetValueEx(a, r["name"], 0, winreg.REG_BINARY, bytes([2 if r["was_enabled"] else 3]) + bytes(11))
                 else:
                     p = r["path"]; cur = p if os.path.exists(p) else p + ".disabled"
                     target = p if r["was_enabled"] else p + ".disabled"
