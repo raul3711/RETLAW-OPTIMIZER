@@ -1,9 +1,9 @@
-# RETLAW OPTIMIZER
+# IMEYFISHY OPTIMIZER
 
-Optimizador seguro para jugadores competitivos de Fortnite (Windows 10/11 x64).
+Optimizador seguro para jugadores competitivos de Fortnite (Windows 10/11 x64). Tema negro y morado.
 
 ## Descargar
-Ve a la pestaña **Releases** y descarga `RETLAW_OPTIMIZER.exe`. Es un único archivo: doble clic y listo.
+Ve a la pestaña **Releases** y descarga `IMEYFISHY_OPTIMIZER.exe`. Es un único archivo: doble clic y listo.
 No necesita Python ni ninguna instalación. Si Windows SmartScreen avisa, pulsa "Más información" → "Ejecutar de todas formas" (el .exe no está firmado digitalmente).
 
 ## Funciones

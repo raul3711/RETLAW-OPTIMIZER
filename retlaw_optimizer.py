@@ -1,4 +1,4 @@
-"""RETLAW OPTIMIZER - Optimizador seguro para jugadores competitivos (Windows 10/11 x64)."""
+"""IMEYFISHY OPTIMIZER - Optimizador seguro para jugadores competitivos (Windows 10/11 x64)."""
 import os, sys, json, time, shutil, ctypes, tempfile, threading, subprocess
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -11,11 +11,13 @@ try:
 except ImportError:
     winreg = None
 
-APP, VERSION = "RETLAW OPTIMIZER", "1.0"
-BG, PANEL, CARD, BLUE, BLUE_DIM, BLUE_HOT = "#070b12", "#0d1420", "#121c2c", "#1e90ff", "#0f4f8f", "#5db3ff"
-FG, DIM, OK, WARN, ERR = "#e8f2ff", "#7d8fa8", "#2ecc71", "#f1c40f", "#ff5c5c"
+APP, VERSION = "IMEYFISHY OPTIMIZER", "1.1"
+BRAND1, BRAND2 = "IMEYFISHY", "OPTIMIZER"
+BG, PANEL, CARD, BLUE, BLUE_DIM, BLUE_HOT = "#0a0712", "#120c1f", "#1a1230", "#a855f7", "#5b2a9e", "#c084fc"
+FG, DIM, OK, WARN, ERR = "#f3e8ff", "#8f7fa8", "#2ecc71", "#f1c40f", "#ff5c5c"
+BORDER, TROUGH, HOVER_NAV, HOVER_BTN, ACCENT_TXT, TOAST_BG, LOG_BG, LOG_FG = "#2d2050", "#241a3d", "#1f1538", "#2a1d4a", "#120a1f", "#1c1233", "#07050d", "#d8b4fe"
 NO_WIN = 0x08000000
-DATA_DIR = os.path.join(os.getenv("APPDATA", tempfile.gettempdir()), "RetlawOptimizer")
+DATA_DIR = os.path.join(os.getenv("APPDATA", tempfile.gettempdir()), "ImeyfishyOptimizer")
 os.makedirs(DATA_DIR, exist_ok=True)
 LOG_FILE = os.path.join(DATA_DIR, "cambios.json")
 
@@ -45,7 +47,7 @@ PROTECTED_PROCS = {"system", "registry", "smss.exe", "csrss.exe", "wininit.exe",
     "securityhealthsystray.exe", "mpdefendercoreservice.exe", "easyanticheat.exe", "easyanticheat_eos.exe", "easyanticheat_launcher.exe", "beservice.exe",
     "fortniteclient-win64-shipping.exe", "fortniteclient-win64-shipping_eac.exe", "fortniteclient-win64-shipping_eac_eos.exe", "fortnitelauncher.exe",
     "epicgameslauncher.exe", "epicwebhelper.exe", "audiodg.exe", "spoolsv.exe", "searchindexer.exe", "nvcontainer.exe", "nvdisplay.container.exe", "nvidia share.exe",
-    "amdrsserv.exe", "radeonsoftware.exe", "igfxem.exe", "conhost.exe", "wmiprvse.exe", "dllhost.exe", "python.exe", "pythonw.exe", "retlaw_optimizer.exe",
+    "amdrsserv.exe", "radeonsoftware.exe", "igfxem.exe", "conhost.exe", "wmiprvse.exe", "dllhost.exe", "python.exe", "pythonw.exe", "imeyfishy_optimizer.exe", "retlaw_optimizer.exe",
     "applicationframehost.exe", "startmenuexperiencehost.exe", "shellexperiencehost.exe", "textinputhost.exe", "lockapp.exe", "wudfhost.exe", "dashost.exe",
     "memory compression", "idle", "system idle process"}
 OPTIONAL_HINTS = {"discord.exe": "Discord", "spotify.exe": "Spotify", "chrome.exe": "Google Chrome", "msedge.exe": "Microsoft Edge", "firefox.exe": "Firefox",
@@ -100,9 +102,9 @@ class ChangeLog:
 class HoverButton(tk.Button):
     def __init__(self, master, accent=False, **kw):
         base = BLUE if accent else CARD
-        super().__init__(master, bg=base, fg="#03101f" if accent else FG, activebackground=BLUE_HOT if accent else BLUE_DIM, activeforeground="#03101f" if accent else "white",
-                         relief="flat", bd=0, cursor="hand2", font=("Segoe UI Semibold", 10), padx=16, pady=9, highlightthickness=1, highlightbackground=BLUE if accent else "#1e2d44", **kw)
-        self._base, self._hover = base, (BLUE_HOT if accent else "#1a2a42")
+        super().__init__(master, bg=base, fg=ACCENT_TXT if accent else FG, activebackground=BLUE_HOT if accent else BLUE_DIM, activeforeground=ACCENT_TXT if accent else "white",
+                         relief="flat", bd=0, cursor="hand2", font=("Segoe UI Semibold", 10), padx=16, pady=9, highlightthickness=1, highlightbackground=BLUE if accent else BORDER, **kw)
+        self._base, self._hover = base, (BLUE_HOT if accent else HOVER_BTN)
         self.bind("<Enter>", lambda e: self._fade(self._hover)); self.bind("<Leave>", lambda e: self._fade(self._base))
     def _fade(self, target, step=0):
         if step > 4: self.config(bg=target); return
@@ -125,7 +127,7 @@ class Gauge(tk.Canvas):
         self.draw()
     def draw(self):
         self.delete("all"); s, m = self.size, 10
-        self.create_oval(m, m, s - m, s - m, outline="#15223a", width=10)
+        self.create_oval(m, m, s - m, s - m, outline=TROUGH, width=10)
         col = BLUE if self.shown < 70 else WARN if self.shown < 90 else ERR
         self.create_arc(m, m, s - m, s - m, start=90, extent=-3.6 * self.shown, style="arc", outline=col, width=10)
         self.create_text(s / 2, s / 2 - 6, text=f"{self.shown:.0f}%", fill=FG, font=("Segoe UI Black", 18))
@@ -143,13 +145,13 @@ class App(tk.Tk):
         self._style(); self._build()
         if psutil: threading.Thread(target=self._monitor_loop, daemon=True).start()
         self.protocol("WM_DELETE_WINDOW", self._quit)
-        self.after(600, lambda: self.toast("Bienvenido a RETLAW OPTIMIZER" if is_admin() else "Sin permisos de administrador: algunas funciones estaran limitadas", OK if is_admin() else WARN))
+        self.after(600, lambda: self.toast("Bienvenido a " + APP if is_admin() else "Sin permisos de administrador: algunas funciones estaran limitadas", OK if is_admin() else WARN))
 
     def _quit(self): self.running = False; self.destroy()
 
     def _style(self):
         s = ttk.Style(self); s.theme_use("clam")
-        s.configure("TProgressbar", troughcolor="#15223a", background=BLUE, bordercolor="#15223a", lightcolor=BLUE, darkcolor=BLUE, thickness=10)
+        s.configure("TProgressbar", troughcolor=TROUGH, background=BLUE, bordercolor=TROUGH, lightcolor=BLUE, darkcolor=BLUE, thickness=10)
         s.configure("Treeview", background=CARD, fieldbackground=CARD, foreground=FG, rowheight=26, font=("Segoe UI", 10), borderwidth=0)
         s.configure("Treeview.Heading", background=PANEL, foreground=BLUE, font=("Segoe UI Semibold", 10), relief="flat")
         s.map("Treeview", background=[("selected", BLUE_DIM)], foreground=[("selected", "white")])
@@ -162,8 +164,8 @@ class App(tk.Tk):
         self.logo_lbl = tk.Label(head, text="⬢", bg=PANEL, fg=BLUE, font=("Segoe UI", 34), cursor="hand2"); self.logo_lbl.pack(side="left")
         self.logo_lbl.bind("<Button-1>", lambda e: self.pick_logo())
         tt = tk.Frame(head, bg=PANEL); tt.pack(side="left", padx=8)
-        tk.Label(tt, text="RETLAW", bg=PANEL, fg=FG, font=("Impact", 20)).pack(anchor="w")
-        tk.Label(tt, text="OPTIMIZER", bg=PANEL, fg=BLUE, font=("Impact", 13)).pack(anchor="w")
+        tk.Label(tt, text=BRAND1, bg=PANEL, fg=FG, font=("Impact", 18)).pack(anchor="w")
+        tk.Label(tt, text=BRAND2, bg=PANEL, fg=BLUE, font=("Impact", 13)).pack(anchor="w")
         tk.Label(side, text="clic en el logo para cambiarlo", bg=PANEL, fg=DIM, font=("Segoe UI", 8)).pack()
         self._load_logo()
         tk.Frame(side, bg=BLUE, height=2).pack(fill="x", padx=18, pady=12)
@@ -172,7 +174,7 @@ class App(tk.Tk):
             b = tk.Button(side, text=f"  {icon}   {name}", anchor="w", command=lambda n=name: self.show(n), bg=PANEL, fg=FG, activebackground=BLUE_DIM,
                           activeforeground="white", relief="flat", bd=0, font=("Segoe UI", 11), padx=16, pady=10, cursor="hand2")
             b.pack(fill="x"); self.navs[name] = b
-            b.bind("<Enter>", lambda e, b=b: b.config(bg="#15213a") if b["bg"] != BLUE_DIM else None)
+            b.bind("<Enter>", lambda e, b=b: b.config(bg=HOVER_NAV) if b["bg"] != BLUE_DIM else None)
             b.bind("<Leave>", lambda e, b=b: b.config(bg=PANEL) if b["bg"] != BLUE_DIM else None)
         tk.Label(side, text=f"v{VERSION} - Windows 10/11 x64\n{'Administrador' if is_admin() else 'Usuario estandar'}", bg=PANEL, fg=DIM, font=("Segoe UI", 8), justify="center").pack(side="bottom", pady=12)
         main = tk.Frame(self, bg=BG); main.pack(side="left", fill="both", expand=True)
@@ -180,7 +182,7 @@ class App(tk.Tk):
         self.toast_lbl = tk.Label(main, text="", bg=BG, fg=FG, font=("Segoe UI Semibold", 10), anchor="w", padx=12, pady=6); self.toast_lbl.pack(fill="x", padx=22)
         logf = tk.Frame(main, bg=PANEL); logf.pack(fill="x", padx=22, pady=(4, 14))
         tk.Label(logf, text="ACTIVIDAD", bg=PANEL, fg=BLUE, font=("Segoe UI Semibold", 8)).pack(anchor="w", padx=10, pady=(5, 0))
-        self.logbox = tk.Text(logf, height=5, bg="#05080e", fg="#9cd2ff", relief="flat", font=("Consolas", 9), state="disabled"); self.logbox.pack(fill="x", padx=10, pady=(2, 8))
+        self.logbox = tk.Text(logf, height=5, bg=LOG_BG, fg=LOG_FG, relief="flat", font=("Consolas", 9), state="disabled"); self.logbox.pack(fill="x", padx=10, pady=(2, 8))
         self._home(); self._clean(); self._bloat(); self._game(); self._monitor(); self._startup(); self._restore()
         self.show("Inicio")
 
@@ -211,7 +213,7 @@ class App(tk.Tk):
         self.after(0, _)
     def toast(self, msg, color=BLUE):
         def _():
-            self.toast_lbl.config(text="●  " + msg, fg=color, bg="#0c1a2b"); self.after(4500, lambda: self.toast_lbl.config(text="", bg=BG))
+            self.toast_lbl.config(text="●  " + msg, fg=color, bg=TOAST_BG); self.after(4500, lambda: self.toast_lbl.config(text="", bg=BG))
         self.after(0, _)
     def task(self, fn, *a): threading.Thread(target=fn, args=a, daemon=True).start()
     def ask(self, title, msg): return messagebox.askyesno(title, msg, icon="warning", parent=self)
@@ -238,13 +240,13 @@ class App(tk.Tk):
         g = tk.Frame(f, bg=BG); g.pack(fill="x")
         self.g_cpu, self.g_ram, self.g_disk = Gauge(g, "CPU"), Gauge(g, "RAM"), Gauge(g, "DISCO")
         for i, w in enumerate([self.g_cpu, self.g_ram, self.g_disk]): w.grid(row=0, column=i, padx=14)
-        info = tk.Frame(g, bg=CARD, highlightthickness=1, highlightbackground="#1e2d44"); info.grid(row=0, column=3, sticky="nsew", padx=14); g.columnconfigure(3, weight=1)
+        info = tk.Frame(g, bg=CARD, highlightthickness=1, highlightbackground=BORDER); info.grid(row=0, column=3, sticky="nsew", padx=14); g.columnconfigure(3, weight=1)
         self.sys_lbl = tk.Label(info, text="Leyendo informacion del sistema...", bg=CARD, fg=FG, font=("Consolas", 9), justify="left", anchor="nw"); self.sys_lbl.pack(fill="both", expand=True, padx=12, pady=10)
         self.task(self._sysinfo)
         cards = tk.Frame(f, bg=BG); cards.pack(fill="both", expand=True, pady=16)
         for i, (t, s, name) in enumerate([("🧹  Analizar limpieza", "Calcula cuanto espacio puedes recuperar", "Limpieza"), ("📦  Revisar bloatware", "Apps opcionales vs componentes esenciales", "Bloatware"),
                                            ("🎮  Preparar Fortnite", "Cierra lo que elijas y aplica el perfil seguro", "Modo Competitivo"), ("🚀  Inicio de Windows", "Controla que arranca con el PC", "Inicio de Windows")]):
-            c = tk.Frame(cards, bg=CARD, highlightthickness=1, highlightbackground="#1e2d44"); c.grid(row=i // 2, column=i % 2, sticky="nsew", padx=6, pady=6)
+            c = tk.Frame(cards, bg=CARD, highlightthickness=1, highlightbackground=BORDER); c.grid(row=i // 2, column=i % 2, sticky="nsew", padx=6, pady=6)
             cards.columnconfigure(i % 2, weight=1); cards.rowconfigure(i // 2, weight=1)
             tk.Label(c, text=t, bg=CARD, fg=FG, font=("Segoe UI Semibold", 12)).pack(anchor="w", padx=14, pady=(12, 0))
             tk.Label(c, text=s, bg=CARD, fg=DIM, font=("Segoe UI", 9)).pack(anchor="w", padx=14)
@@ -418,7 +420,7 @@ class App(tk.Tk):
         r = tk.Frame(left, bg=BG); r.pack(fill="x", pady=8)
         HoverButton(r, text="🔍  ANALIZAR CONSUMO", command=lambda: self.task(self.scan_procs)).pack(side="left")
         HoverButton(r, text="✖  CERRAR SELECCIONADAS", command=self.confirm_close, accent=True).pack(side="left", padx=8)
-        right = tk.Frame(top, bg=CARD, highlightthickness=1, highlightbackground="#1e2d44", width=330); right.pack(side="left", fill="y", padx=(16, 0)); right.pack_propagate(False)
+        right = tk.Frame(top, bg=CARD, highlightthickness=1, highlightbackground=BORDER, width=330); right.pack(side="left", fill="y", padx=(16, 0)); right.pack_propagate(False)
         tk.Label(right, text="PERFIL DE PREPARACION", bg=CARD, fg=BLUE, font=("Segoe UI Semibold", 11)).pack(anchor="w", padx=14, pady=(12, 4))
         tk.Label(right, text="Cambios seguros, registrados y reversibles desde Restauracion:", bg=CARD, fg=DIM, font=("Segoe UI", 9), wraplength=290, justify="left").pack(anchor="w", padx=14)
         self.game_opts = {}
@@ -639,7 +641,7 @@ class App(tk.Tk):
 
     # ---------------- RESTAURACION ----------------
     def _restore(self):
-        f = self.page("Restauracion", "Registro de cambios y restauracion", "Todo lo que RETLAW modifica queda aqui. Puedes revertir cada cambio cuando sea tecnicamente posible.")
+        f = self.page("Restauracion", "Registro de cambios y restauracion", "Todo lo que " + BRAND1 + " modifica queda aqui. Puedes revertir cada cambio cuando sea tecnicamente posible.")
         r = tk.Frame(f, bg=BG); r.pack(fill="x", pady=(0, 8))
         HoverButton(r, text="🛡  CREAR PUNTO DE RESTAURACION", command=self.confirm_restore_point, accent=True).pack(side="left")
         HoverButton(r, text="↩  REVERTIR SELECCIONADOS", command=self.confirm_revert).pack(side="left", padx=8)
@@ -655,11 +657,11 @@ class App(tk.Tk):
 
     def confirm_restore_point(self):
         if not self.need_admin(): return
-        if self.ask("Punto de restauracion", "Se creara un punto de restauracion de Windows llamado 'RETLAW OPTIMIZER'. Puede tardar un minuto. Continuar?"):
+        if self.ask("Punto de restauracion", "Se creara un punto de restauracion de Windows llamado '" + APP + "'. Puede tardar un minuto. Continuar?"):
             self.task(self.create_restore_point)
     def create_restore_point(self):
         self.toast("Creando punto de restauracion...")
-        out, rc = ps("Enable-ComputerRestore -Drive $env:SystemDrive -ErrorAction SilentlyContinue; Checkpoint-Computer -Description 'RETLAW OPTIMIZER' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop", 300)
+        out, rc = ps("Enable-ComputerRestore -Drive $env:SystemDrive -ErrorAction SilentlyContinue; Checkpoint-Computer -Description '" + APP + "' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop", 300)
         if rc == 0 and "error" not in out.lower(): self.log("Punto de restauracion creado."); self.toast("Punto de restauracion creado correctamente", OK)
         else: self.log("Punto de restauracion: " + out.strip()[:200]); self.toast("Windows no permitio crear el punto (Proteccion del sistema desactivada o ya existe uno de hace menos de 24 h)", WARN)
 
@@ -695,7 +697,7 @@ class App(tk.Tk):
 
 def main():
     if os.name != "nt":
-        print("RETLAW OPTIMIZER es una aplicacion para Windows."); return
+        print(APP + " es una aplicacion para Windows."); return
     if winreg is None or psutil is None:
         ctypes.windll.user32.MessageBoxW(0, "Faltan componentes internos (psutil/winreg).", APP, 0x10); return
     App().mainloop()
