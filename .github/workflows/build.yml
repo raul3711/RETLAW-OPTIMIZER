@@ -1,4 +1,4 @@
-name: Build SHARK_OPTIMIZER.exe
+name: Build CHIZI_OPTIMIZER.exe
 
 on:
   push:
@@ -20,17 +20,17 @@ jobs:
       - name: Install build tools
         run: pip install pyinstaller psutil
       - name: Build single-file EXE (no console, asks for admin)
-        run: pyinstaller --onefile --noconsole --name SHARK_OPTIMIZER --uac-admin --clean retlaw_optimizer.py
+        run: pyinstaller --onefile --noconsole --name CHIZI_OPTIMIZER --uac-admin --clean retlaw_optimizer.py
       - name: Verify EXE exists
         shell: pwsh
         run: |
-          $f = Get-Item dist/SHARK_OPTIMIZER.exe
+          $f = Get-Item dist/CHIZI_OPTIMIZER.exe
           "Tamano: $([math]::Round($f.Length/1MB,1)) MB"
           if ($f.Length -lt 5MB) { throw "EXE demasiado pequeno, compilacion incorrecta" }
       - name: Smoke test (EXE starts without Python)
         shell: pwsh
         run: |
-          $p = Start-Process -FilePath dist/SHARK_OPTIMIZER.exe -PassThru
+          $p = Start-Process -FilePath dist/CHIZI_OPTIMIZER.exe -PassThru
           Start-Sleep -Seconds 8
           if ($p.HasExited) { throw "El EXE se cerro solo (codigo $($p.ExitCode))" }
           Stop-Process -Id $p.Id -Force
@@ -38,14 +38,14 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SHARK_OPTIMIZER
-          path: dist/SHARK_OPTIMIZER.exe
+          name: CHIZI_OPTIMIZER
+          path: dist/CHIZI_OPTIMIZER.exe
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.2.${{ github.run_number }}
-          name: SHARK OPTIMIZER v1.2.${{ github.run_number }}
+          tag_name: v1.3.${{ github.run_number }}
+          name: CHIZI OPTIMIZER v1.3.${{ github.run_number }}
           body: |
-            SHARK_OPTIMIZER.exe - Windows 10/11 x64, archivo unico, sin instalacion.
+            CHIZI_OPTIMIZER.exe - Windows 10/11 x64, archivo unico, sin instalacion.
             Clic derecho > Ejecutar como administrador para todas las funciones.
-          files: dist/SHARK_OPTIMIZER.exe
+          files: dist/CHIZI_OPTIMIZER.exe
